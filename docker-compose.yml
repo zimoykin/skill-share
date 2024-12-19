@@ -1,11 +1,33 @@
 services:
   app:
-    container_name: your_app
+    container_name: skill-share_api
     build:
       context: .
       args:
-         NPM_TOKEN: $NPM_TOKEN
+        NPM_TOKEN: $NPM_TOKEN
     env_file:
       - .env
     ports:
       - "8081:3000"
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:5.7
+    container_name: mysql_container
+    platform: linux/amd64
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "${DB_PORT}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    env_file:
+      - .env
+
+volumes:
+  mysql_data:
