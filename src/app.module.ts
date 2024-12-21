@@ -6,12 +6,22 @@ import { AppService } from './app.service';
 import { ConfigVariables, serviceSchema } from './service-config';
 import { SkillsModule } from './skills/skills.module';
 import { Skill } from './skills/entities/skill.entity';
+import { JwtModule } from '@zimoykin/auth';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: serviceSchema,
+    }),
+    JwtModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService<ConfigVariables>) => {
+        return {
+          secret: config.get('JWT_SECRET')!,
+        };
+      },
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
