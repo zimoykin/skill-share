@@ -2,11 +2,14 @@ import { Controller, Get, Logger } from '@nestjs/common';
 import { SkillsService } from './skills.service';
 import { SkillOutputDto } from './dtos/skill-output.dto';
 import { plainToInstance } from 'class-transformer';
+import { UserAccess } from '@zimoykin/auth';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@UserAccess()
+@ApiBearerAuth('Authorization')
 @Controller('v1/skills')
 export class SkillsController {
   private readonly logger = new Logger(SkillsController.name);
-
   constructor(private readonly skillsService: SkillsService) {}
 
   @Get()

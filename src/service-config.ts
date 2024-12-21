@@ -8,6 +8,7 @@ const schema = {
   DB_PASSWORD: Joi.string().required(),
   DB_DATABASE: Joi.string().required(),
   DB_PORT: Joi.number().default(3306),
+  JWT_SECRET: Joi.string().required(),
   MONGO_CONNECTION: Joi.string()
     .uri({ scheme: ['mongodb', 'mongodb+srv'] })
     .optional(),
