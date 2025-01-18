@@ -7,6 +7,8 @@ import { ConfigVariables, serviceSchema } from './service-config';
 import { SkillsModule } from './skills/skills.module';
 import { Skill } from './skills/entities/skill.entity';
 import { JwtModule } from '@zimoykin/auth';
+import { CategoriesModule } from './categories/categories.module';
+import { Category } from './categories/entity/category.entity';
 
 @Module({
   imports: [
@@ -35,11 +37,12 @@ import { JwtModule } from '@zimoykin/auth';
           password: config.get<string>('DB_PASSWORD')!,
           database: config.get<string>('DB_DATABASE')!,
           synchronize: process.env.NODE_ENV !== 'prod',
-          entities: [Skill],
+          entities: [Skill, Category],
         };
       },
     }),
     SkillsModule,
+    CategoriesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
