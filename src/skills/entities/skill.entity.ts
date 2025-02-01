@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Category } from '../../categories/entity/category.entity';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({
   name: 'ssh_skills',
@@ -21,4 +22,7 @@ export class Skill {
     nullable: true,
   })
   image?: string;
+
+  @ManyToOne(() => Category, (category) => category.skills)
+  category: Category;
 }
