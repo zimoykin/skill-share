@@ -4,6 +4,8 @@ import { ConfigVariables } from './service-config';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import pkg from '../package.json';
+import session from 'express-session';
+import passport from 'passport';
 import { Logger, ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
@@ -12,11 +14,24 @@ async function bootstrap() {
   const port = conf.get<number>('PORT') ?? 3000;
 
   const logger = new Logger('NestApplication');
+
+  app.use(
+    session({
+      secret: conf.get('SESSION_SECRET') || 'default_secret',
+      resave: false,
+      saveUninitialized: false,
+    }),
+  );
+
+  app.use(passport.initialize());
+  app.use(passport.session());
+
   app.enableCors({
     origin: '*',
     exposedHeaders:
       'Authorization, X-Requested-With, Origin, Content-Type, Accept',
     methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
+    credentials: true,
   });
 
   app.setGlobalPrefix('api');
@@ -45,7 +60,7 @@ async function bootstrap() {
     )
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document, {
+  SwaggerModule.setup('specs', app, document, {
     swaggerOptions: { persistAuthorization: true },
   });
 
