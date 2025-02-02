@@ -1,12 +1,10 @@
-import { Controller, Get, Logger, Param } from '@nestjs/common';
+import { Controller, Get, Logger, Param, UseGuards } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
-import { ApiBearerAuth } from '@nestjs/swagger';
-import { UserAccess } from '@zimoykin/auth';
 import { CategoryOutDto } from './dtos/category-out.dto';
 import { plainToInstance } from 'class-transformer';
+import { GHAuthGuard } from 'src/github/github.guard';
 
-@UserAccess()
-@ApiBearerAuth('Authorization')
+@UseGuards(GHAuthGuard)
 @Controller('v1/categories')
 export class CategoriesController {
   private readonly logger = new Logger(CategoriesController.name);

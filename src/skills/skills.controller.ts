@@ -1,12 +1,10 @@
-import { Controller, Get, Logger } from '@nestjs/common';
+import { Controller, Get, Logger, UseGuards } from '@nestjs/common';
 import { SkillsService } from './skills.service';
 import { SkillOutputDto } from './dtos/skill-output.dto';
 import { plainToInstance } from 'class-transformer';
-import { UserAccess } from '@zimoykin/auth';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { GHAuthGuard } from 'src/github/github.guard';
 
-@UserAccess()
-@ApiBearerAuth('Authorization')
+@UseGuards(GHAuthGuard)
 @Controller('v1/skills')
 export class SkillsController {
   private readonly logger = new Logger(SkillsController.name);

@@ -2,10 +2,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { UserRole } from '../enums/user-role.enum';
+import { Auth } from './auth.entity';
 
 @Entity({
   name: 'ssh_users',
@@ -32,6 +34,11 @@ export class User {
     nullable: true,
   })
   avatar?: string;
+
+  @OneToOne(() => Auth, (user) => user.id, {
+    onDelete: 'CASCADE',
+  })
+  parent?: Auth;
 
   @Column({
     nullable: false,
