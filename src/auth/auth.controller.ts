@@ -1,17 +1,38 @@
-import { Controller, Get, Logger, Req, Res, UseGuards } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { AuthGuard } from '@nestjs/passport';
+import {
+  Controller,
+  Get,
+  Logger,
+  NotFoundException,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
+import { UserService } from './users.service';
 import { Request, Response } from 'express';
 import { IUserGitHub } from './interfaces/github-user.interface';
 import { plainToInstance } from 'class-transformer';
 import { UserOutDTO } from './dtos/user-out-dto';
 import { UserRole } from './enums/user-role.enum';
+import { AuthGuard } from '@nestjs/passport';
+import { AuthUser } from './decorators/auth-user.decorator';
+import { IAuthUser } from './interfaces/user.interface';
+import { GHAuthGuard } from 'src/github/github.guard';
+
+const cookieOptions = {
+  httpOnly: true,
+  sameSite: 'none',
+  secure: true,
+  expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 10), // 10 days
+  path: '/',
+  signed: true,
+} as const;
 
 @Controller('auth')
 export class AuthController {
   private readonly logger = new Logger(AuthController.name);
 
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly service: UserService) {}
 
   @Get('github')
   @UseGuards(AuthGuard('github'))
@@ -21,7 +42,10 @@ export class AuthController {
 
   @Get('github/callback')
   @UseGuards(AuthGuard('github'))
-  async githubCallback(@Req() req: Request, @Res() res: Response) {
+  async githubCallback(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     this.logger.log('githubCallback');
     this.logger.log(JSON.stringify(req.user));
 
@@ -36,8 +60,8 @@ export class AuthController {
     }
 
     const userDB =
-      (await this.authService.findUserByGitHubId(user.id)) ||
-      (await this.authService.createUserByGitHub(user));
+      (await this.service.findUserByGitHubId(user.id)) ||
+      (await this.service.createUserByGitHub(user));
     if (!userDB) {
       return res.sendStatus(500);
     }
@@ -45,19 +69,38 @@ export class AuthController {
     if (userDB?.role === UserRole.INACTIVE) {
       return res.sendStatus(403);
     }
-    const clearedUser = plainToInstance(UserOutDTO, userDB);
 
-    const frontendUrl = await this.authService.getFrontendURlPage();
-    res.redirect(
+    const tokens = await this.service.generateTokens({
+      role: userDB.role,
+      username: userDB.username,
+      id: userDB.id,
+      email: userDB.email,
+      gitHubId: userDB.gitHubId ?? '',
+    });
+    const clearedUser = plainToInstance(UserOutDTO, userDB);
+    const frontendUrl = await this.service.getFrontendURlPage();
+
+    res.cookie('access_token', tokens.accessToken, cookieOptions);
+    res.cookie('refresh_token', tokens.refreshToken, cookieOptions);
+
+    return res.redirect(
       `${frontendUrl}?user=${encodeURIComponent(JSON.stringify(clearedUser))}`,
     );
   }
 
   @Get('logout')
-  async logout(@Req() req: Request, @Res() res: Response) {
-    req.logout(() => {
-      res.sendStatus(200);
-    });
+  @UseGuards(GHAuthGuard)
+  async logout(@Res() res: Response, @AuthUser() authUser: IAuthUser) {
+    try {
+      res.clearCookie('access_token');
+      res.clearCookie('refresh_token');
+      await this.service.logout(authUser.id, () => {
+        return res.sendStatus(200);
+      });
+    } catch (error) {
+      this.logger.error(error);
+      return res.sendStatus(500);
+    }
   }
 
   @Get('user')
@@ -66,7 +109,35 @@ export class AuthController {
     if (!user) {
       return null;
     }
-    const userDB = await this.authService.findUserByGitHubId(user.id);
+    const userDB = await this.service.findUserByGitHubId(user.id);
     return plainToInstance(UserOutDTO, userDB);
+  }
+
+  @Post('refresh')
+  @UseGuards(GHAuthGuard)
+  async refresh(
+    @Req() req: Request,
+    @Res() res: Response,
+    @AuthUser() authUser: IAuthUser,
+  ) {
+    const refreshToken = req.signedCookies['refresh_token'];
+    if (await this.service.checkAndValidateToken(refreshToken, authUser.id)) {
+      const user = await this.service.findUserByGitHubId(authUser.id);
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+      const tokens = await this.service.generateTokens({
+        role: user.role,
+        username: user.username,
+        id: user.id,
+        email: user.email,
+        gitHubId: user.gitHubId ?? '',
+      });
+      res.cookie('access_token', tokens.accessToken, cookieOptions);
+      res.cookie('refresh_token', tokens.refreshToken, cookieOptions);
+      return res.sendStatus(200);
+    } else {
+      throw new Error('Invalid token');
+    }
   }
 }

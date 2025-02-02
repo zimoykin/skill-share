@@ -4,30 +4,18 @@ import { ConfigVariables } from './service-config';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import pkg from '../package.json';
-import session from 'express-session';
-import passport from 'passport';
 import { Logger, ValidationPipe } from '@nestjs/common';
+import cookie from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const conf = app.get(ConfigService<ConfigVariables>);
   const port = conf.get<number>('PORT') ?? 3000;
 
-  const logger = new Logger('NestApplication');
-
-  app.use(
-    session({
-      secret: conf.get('SESSION_SECRET') || 'default_secret',
-      resave: false,
-      saveUninitialized: false,
-    }),
-  );
-
-  app.use(passport.initialize());
-  app.use(passport.session());
+  const logger = new Logger('NestApplication', { timestamp: true });
 
   app.enableCors({
-    origin: '*',
+    origin: ['http://localhost:4000', 'http://localhost:3000'],
     exposedHeaders:
       'Authorization, X-Requested-With, Origin, Content-Type, Accept',
     methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
@@ -35,6 +23,7 @@ async function bootstrap() {
   });
 
   app.setGlobalPrefix('api');
+  app.use(cookie('secret2'));
 
   app.useGlobalPipes(
     new ValidationPipe({

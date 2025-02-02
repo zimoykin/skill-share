@@ -10,8 +10,8 @@ import { JwtModule } from '@zimoykin/auth';
 import { CategoriesModule } from './categories/categories.module';
 import { Category } from './categories/entity/category.entity';
 import { AuthModule } from './auth/auth.module';
-import { GithubModule } from './github/github.module';
 import { User } from './auth/entity/user.entity';
+import { Auth } from './auth/entity/auth.entity';
 
 @Module({
   imports: [
@@ -40,14 +40,13 @@ import { User } from './auth/entity/user.entity';
           password: config.get<string>('DB_PASSWORD')!,
           database: config.get<string>('DB_DATABASE')!,
           synchronize: process.env.NODE_ENV !== 'prod',
-          entities: [Skill, Category, User],
+          entities: [Skill, Category, User, Auth],
         };
       },
     }),
     SkillsModule,
     CategoriesModule,
     AuthModule,
-    GithubModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -3,11 +3,11 @@ import { SkillsService } from './skills.service';
 import { SkillOutputDto } from './dtos/skill-output.dto';
 import { plainToInstance } from 'class-transformer';
 import { SkillInputDto } from './dtos/skill-input.dto';
-import { AdminAccess } from '@zimoykin/auth';
-import { ApiBearerAuth } from '@nestjs/swagger';
+// import { AdminAccess } from '@zimoykin/auth';
+// import { ApiBearerAuth } from '@nestjs/swagger';
 
-@AdminAccess()
-@ApiBearerAuth('Authorization')
+// @AdminAccess()
+// @ApiBearerAuth('Authorization')
 @Controller('v1/admin/skills')
 export class SkillsProtectedController {
   private readonly logger = new Logger(SkillsProtectedController.name);
