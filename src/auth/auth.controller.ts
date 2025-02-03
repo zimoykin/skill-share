@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Controller,
   Get,
   Logger,
@@ -114,30 +115,27 @@ export class AuthController {
   }
 
   @Post('refresh')
-  @UseGuards(GHAuthGuard)
-  async refresh(
-    @Req() req: Request,
-    @Res() res: Response,
-    @AuthUser() authUser: IAuthUser,
-  ) {
+  async refresh(@Req() req: Request, @Res() res: Response) {
     const refreshToken = req.signedCookies['refresh_token'];
-    if (await this.service.checkAndValidateToken(refreshToken, authUser.id)) {
-      const user = await this.service.findUserByGitHubId(authUser.id);
-      if (!user) {
-        throw new NotFoundException('User not found');
-      }
-      const tokens = await this.service.generateTokens({
-        role: user.role,
-        username: user.username,
-        id: user.id,
-        email: user.email,
-        gitHubId: user.gitHubId ?? '',
-      });
-      res.cookie('access_token', tokens.accessToken, cookieOptions);
-      res.cookie('refresh_token', tokens.refreshToken, cookieOptions);
-      return res.sendStatus(200);
-    } else {
-      throw new Error('Invalid token');
+    const auth = await this.service.checkAndValidateToken(refreshToken);
+
+    if (!auth) {
+      throw new BadRequestException('Invalid refresh token');
     }
+
+    const user = await this.service.findUserById(auth.userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    const tokens = await this.service.generateTokens({
+      role: user.role,
+      username: user.username,
+      id: user.id,
+      email: user.email,
+      gitHubId: user.gitHubId ?? '',
+    });
+    res.cookie('access_token', tokens.accessToken, cookieOptions);
+    res.cookie('refresh_token', tokens.refreshToken, cookieOptions);
+    return res.sendStatus(200);
   }
 }

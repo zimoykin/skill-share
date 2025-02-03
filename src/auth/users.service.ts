@@ -22,16 +22,25 @@ export class UserService {
     private readonly jwt: JwtService,
   ) {}
 
-  async checkAndValidateToken(refreshToken: string, userId: string) {
+  /**
+   * Finds a user by their unique identifier.
+   * @param userId The unique identifier of the user.
+   * @returns A promise that resolves to the user if found, otherwise null.
+   */
+
+  async findUserById(userId: string) {
+    return this.usersRepository.findOneBy({ id: userId });
+  }
+  async checkAndValidateToken(refreshToken: string) {
     try {
       // verify the tokens
-      await this.jwt.verify(refreshToken, {
+      const { id } = await this.jwt.verify(refreshToken, {
         secret: this.configService.get('JWT_SECRET')!,
       });
       // check if the token is valid
       const auth = await this.authRepository.findOne({
         where: {
-          userId: userId,
+          userId: id,
           token: refreshToken,
         },
       });
@@ -39,7 +48,7 @@ export class UserService {
         throw new Error('Invalid token');
       }
 
-      return true;
+      return auth;
     } catch (error) {
       this.logger.error(error);
       throw new Error('Invalid token');
@@ -124,7 +133,7 @@ export class UserService {
     const tokens = {
       accessToken: await this.jwt.signAsync(payload, {
         secret: this.configService.get('JWT_SECRET')!,
-        expiresIn: '1h',
+        expiresIn: '10m',
       }),
       refreshToken: await this.jwt.signAsync(payload, {
         secret: this.configService.get('JWT_SECRET')!,
