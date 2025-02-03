@@ -23,7 +23,6 @@ export class UsersController {
   @Get()
   @UseGuards(GHAuthGuard)
   async findAll(@Req() req: Request, @AuthUser() user: IAuthUser) {
-    this.logger.debug('findAll');
     if (!req.user) {
       throw new ForbiddenException();
     }
