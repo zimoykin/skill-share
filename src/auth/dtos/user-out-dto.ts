@@ -3,6 +3,9 @@ import { Exclude, Expose } from 'class-transformer';
 @Exclude()
 export class UserOutDTO {
   @Expose()
+  avatar: string;
+
+  @Expose()
   id: string;
 
   @Expose()
@@ -13,9 +16,6 @@ export class UserOutDTO {
 
   @Expose()
   displayName: string;
-
-  @Expose()
-  avatar: string;
 
   @Expose()
   role: string;

@@ -12,6 +12,7 @@ import { Category } from './categories/entity/category.entity';
 import { AuthModule } from './auth/auth.module';
 import { User } from './auth/entity/user.entity';
 import { Auth } from './auth/entity/auth.entity';
+import { AdminSettingsModule } from './admin-settings/admin-settings.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { Auth } from './auth/entity/auth.entity';
     SkillsModule,
     CategoriesModule,
     AuthModule,
+    AdminSettingsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
