@@ -27,6 +27,15 @@ import { LoggerModule } from 'nestjs-pino';
       useFactory: (config: ConfigService<ConfigVariables>) => {
         return {
           pinoHttp: {
+            transport: {
+              target: 'pino-pretty',
+              options: {
+                colorize: true,
+                singleLine: true,
+                translateTime: 'SYS:standard',
+                ignore: 'hostname,pid',
+              },
+            },
             level: config.get('LOG_LEVEL') ?? 'info',
             genReqId: (request) =>
               request.headers['x-correlation-id'] ||
