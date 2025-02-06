@@ -18,7 +18,6 @@ export class SkillsService {
    * @returns {Promise<Array<Skill>>} A promise that resolves to an array of skills,
    * including their associated categories.
    */
-
   async getSkills(): Promise<Array<Skill>> {
     this.logger.debug('getting skills');
     return this.skillsRepository.find({ relations: ['category'] }) ?? [];
