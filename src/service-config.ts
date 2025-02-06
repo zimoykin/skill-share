@@ -13,6 +13,7 @@ const schema = {
   GITHUB_CLIENT_SECRET: Joi.string().required(),
   GITHUB_CALLBACK_URL: Joi.string().required(),
   FRONTEND_GITHUB_AUTH_PAGE: Joi.string().required(),
+  LOG_LEVEL: Joi.string().valid('trace', 'debug', 'info', 'warn', 'error'),
   MONGO_CONNECTION: Joi.string()
     .uri({ scheme: ['mongodb', 'mongodb+srv'] })
     .optional(),

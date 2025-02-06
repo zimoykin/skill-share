@@ -4,15 +4,14 @@ import { ConfigVariables } from './service-config';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import pkg from '../package.json';
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
+import { Logger } from 'nestjs-pino';
 import cookie from 'cookie-parser';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
   const conf = app.get(ConfigService<ConfigVariables>);
   const port = conf.get<number>('PORT') ?? 3000;
-
-  const logger = new Logger('NestApplication', { timestamp: true });
 
   app.enableCors({
     origin: ['http://localhost:4000', 'http://localhost:3000'],
@@ -34,7 +33,7 @@ async function bootstrap() {
     }),
   );
 
-  app.useLogger(logger);
+  app.useLogger(app.get(Logger));
 
   // swagger config
   const config = new DocumentBuilder()
@@ -54,7 +53,8 @@ async function bootstrap() {
   });
 
   // launch app
-  await app.listen(port).then(() => logger.log(`Listening on port ${port}`));
+  await app.listen(port);
+  // .then(() => logger.log(`Listening on port ${port}`));
 }
 
 bootstrap();
