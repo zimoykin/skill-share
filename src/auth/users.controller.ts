@@ -10,7 +10,7 @@ import { UserService } from './users.service';
 import { Request } from 'express';
 import { plainToInstance } from 'class-transformer';
 import { UserOutDTO } from './dtos/user-out-dto';
-import { GHAuthGuard } from 'src/github/github.guard';
+import { JWTGuard } from 'src/github/jwt.guard';
 import { AuthUser } from './decorators/auth-user.decorator';
 import { IAuthUser } from './interfaces/user.interface';
 
@@ -21,7 +21,7 @@ export class UsersController {
   constructor(private readonly service: UserService) {}
 
   @Get()
-  @UseGuards(GHAuthGuard)
+  @UseGuards(JWTGuard)
   async findAll(@Req() req: Request, @AuthUser() user: IAuthUser) {
     if (!req.user) {
       throw new ForbiddenException();

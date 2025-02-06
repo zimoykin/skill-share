@@ -1,10 +1,8 @@
-import { Exclude } from 'class-transformer';
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, IsUUID } from 'class-validator';
 
-@Exclude()
 export class SkillInputDto {
   @IsString()
-  name: string;
+  title: string;
 
   @IsString()
   @IsOptional()
@@ -12,5 +10,9 @@ export class SkillInputDto {
 
   @IsString()
   @IsOptional()
-  image: string;
+  image?: string;
+
+  @IsString()
+  @IsUUID()
+  categoryId: string;
 }

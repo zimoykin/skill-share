@@ -1,6 +1,6 @@
 services:
   app:
-    container_name: skill-share_api
+    container_name: ssh-app
     build:
       context: .
       args:
@@ -10,24 +10,19 @@ services:
     ports:
       - "8081:3000"
     depends_on:
-      - mysql
+      - db
 
-  mysql:
-    image: mysql:5.7
-    container_name: mysql_container
-    platform: linux/amd64
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      MYSQL_DATABASE: ${DB_DATABASE}
-      MYSQL_USER: ${DB_USERNAME}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
+  db:
+    container_name: ssh-database
+    image: postgres:14-alpine
     ports:
-      - "${DB_PORT}:3306"
+      - 5432:5432
     volumes:
-      - mysql_data:/var/lib/mysql
-    env_file:
-      - .env
+      - db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_DB=${DB_DATABASE}
 
 volumes:
-  mysql_data:
+  db:

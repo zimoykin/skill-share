@@ -1,4 +1,6 @@
-import { Exclude, Expose } from 'class-transformer';
+import { Exclude, Expose, Type } from 'class-transformer';
+import { ValidateNested } from 'class-validator';
+import { CategoryOutDto } from 'src/categories/dtos/category-out.dto';
 
 @Exclude()
 export class SkillOutputDto {
@@ -6,11 +8,16 @@ export class SkillOutputDto {
   id: string;
 
   @Expose()
-  name: string;
+  title: string;
 
   @Expose()
   description: string;
 
   @Expose()
-  image: string;
+  @Type(() => CategoryOutDto)
+  @ValidateNested()
+  category: CategoryOutDto;
+
+  @Expose()
+  image?: string;
 }

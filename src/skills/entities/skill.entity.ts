@@ -1,5 +1,12 @@
+import { User } from '../../auth/entity/user.entity';
 import { Category } from '../../categories/entity/category.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity({
   name: 'ssh_skills',
@@ -10,6 +17,7 @@ export class Skill {
 
   @Column({
     nullable: false,
+    unique: true,
   })
   title: string;
 
@@ -23,6 +31,13 @@ export class Skill {
   })
   image?: string;
 
-  @ManyToOne(() => Category, (category) => category.skills)
+  @ManyToOne(() => Category, (category) => category.skills, {
+    onDelete: 'CASCADE',
+    eager: true,
+  })
+  @JoinColumn({ name: 'categoryId' })
   category: Category;
+
+  @ManyToOne(() => User, (user) => user.parent, { onDelete: 'NO ACTION' })
+  user: User;
 }

@@ -6,11 +6,11 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { ConfigVariables } from 'src/service-config';
+import { ConfigVariables } from '../service-config';
 
 @Injectable()
-export class GHAuthGuard implements CanActivate {
-  private readonly logger = new Logger(GHAuthGuard.name);
+export class JWTGuard implements CanActivate {
+  private readonly logger = new Logger(JWTGuard.name);
 
   constructor(
     private readonly jwtService: JwtService,

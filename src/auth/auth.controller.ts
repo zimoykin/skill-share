@@ -18,7 +18,7 @@ import { UserRole } from './enums/user-role.enum';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthUser } from './decorators/auth-user.decorator';
 import { IAuthUser } from './interfaces/user.interface';
-import { GHAuthGuard } from 'src/github/github.guard';
+import { JWTGuard } from 'src/github/jwt.guard';
 
 const cookieOptions = {
   httpOnly: true,
@@ -90,7 +90,7 @@ export class AuthController {
   }
 
   @Get('logout')
-  @UseGuards(GHAuthGuard)
+  @UseGuards(JWTGuard)
   async logout(@Res() res: Response, @AuthUser() authUser: IAuthUser) {
     try {
       res.clearCookie('access_token');

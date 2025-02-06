@@ -1,7 +1,7 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { UserService } from '../auth/users.service';
 import { NavLink } from './interfaces/nav-link.interface';
-import { UserRole } from 'src/auth/enums/user-role.enum';
+import { UserRole } from '../auth/enums/user-role.enum';
 
 @Injectable()
 export class AdminSettingsService {
@@ -17,8 +17,8 @@ export class AdminSettingsService {
     const nav: NavLink = {
       home: '/',
       catalogs: {
-        skills: '/skills',
-        categories: '/categories',
+        skills: '/catalogs/skills',
+        categories: '/catalogs/categories',
       },
     };
 

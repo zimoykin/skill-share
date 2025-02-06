@@ -34,7 +34,7 @@ import { AdminSettingsModule } from './admin-settings/admin-settings.module';
       inject: [ConfigService],
       useFactory: (config: ConfigService<ConfigVariables>) => {
         return {
-          type: 'mariadb',
+          type: 'postgres',
           host: config.get<string>('DB_CONNECTION')!,
           port: config.get<number>('DB_PORT')!,
           username: config.get<string>('DB_USERNAME')!,

@@ -32,7 +32,6 @@ export class CategoriesService {
   }
 
   // admin
-
   /**
    * Creates a new category.
    * @param {Partial<Category>} dto - The data transfer object containing the details of the category to create.
@@ -41,5 +40,26 @@ export class CategoriesService {
   async createCategory(dto: Partial<Category>): Promise<Category> {
     const category = this.categoriesRepository.create(dto);
     return this.categoriesRepository.save(category);
+  }
+
+  /**
+   * Updates a category by id.
+   * @param {string} id - The ID of the category to update.
+   * @param {Partial<Category>} dto - The data transfer object containing the changes to apply to the category.
+   * @returns {Promise<Category>} A promise that resolves to the updated category.
+   */
+  async updateCategoryById(
+    id: string,
+    dto: Partial<Category>,
+  ): Promise<Category> {
+    const category = await this.categoriesRepository.findOne({
+      where: {
+        id: id,
+      },
+    });
+    if (!category) {
+      throw new Error('Category not found');
+    }
+    return this.categoriesRepository.save({ ...category, ...dto });
   }
 }
