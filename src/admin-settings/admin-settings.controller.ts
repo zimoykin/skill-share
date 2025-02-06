@@ -18,4 +18,13 @@ export class AdminSettingsController {
       throw err;
     });
   }
+
+  @Get('widgets')
+  @UseGuards(JWTGuard)
+  async getWidgets(@AuthUser() user: IAuthUser) {
+    return this.adminSettingsService.getWidgets(user.id).catch((err) => {
+      this.logger.error(err);
+      throw err;
+    });
+  }
 }
