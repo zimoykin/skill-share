@@ -22,7 +22,7 @@ async function bootstrap() {
   });
 
   app.setGlobalPrefix('api');
-  app.use(cookie('secret2'));
+  app.use(cookie(conf.get('COOKIE_SECRET')!));
 
   app.useGlobalPipes(
     new ValidationPipe({
