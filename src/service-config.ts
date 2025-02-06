@@ -9,6 +9,7 @@ const schema = {
   DB_DATABASE: Joi.string().required(),
   DB_PORT: Joi.number().default(3306),
   JWT_SECRET: Joi.string().required(),
+  COOKIE_SECRET: Joi.string().required(),
   GITHUB_CLIENT_ID: Joi.string().required(),
   GITHUB_CLIENT_SECRET: Joi.string().required(),
   GITHUB_CALLBACK_URL: Joi.string().required(),
