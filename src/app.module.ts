@@ -13,12 +13,27 @@ import { AuthModule } from './auth/auth.module';
 import { User } from './auth/entity/user.entity';
 import { Auth } from './auth/entity/auth.entity';
 import { AdminSettingsModule } from './admin-settings/admin-settings.module';
+import { LoggerModule } from 'nestjs-pino';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: serviceSchema,
+    }),
+    LoggerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService<ConfigVariables>) => {
+        return {
+          pinoHttp: {
+            level: config.get('LOG_LEVEL') ?? 'info',
+            genReqId: (request) =>
+              request.headers['x-correlation-id'] ||
+              new Date().getTime().toString(),
+          },
+        };
+      },
     }),
     JwtModule.forRootAsync({
       imports: [ConfigModule],
