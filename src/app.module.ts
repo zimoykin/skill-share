@@ -14,6 +14,7 @@ import { User } from './auth/entity/user.entity';
 import { Auth } from './auth/entity/auth.entity';
 import { AdminSettingsModule } from './admin-settings/admin-settings.module';
 import { LoggerModule } from 'nestjs-pino';
+import { RedisModule } from '@zimoykin/redis';
 
 @Module({
   imports: [
@@ -52,6 +53,17 @@ import { LoggerModule } from 'nestjs-pino';
           secret: config.get('JWT_SECRET')!,
         };
       },
+    }),
+    RedisModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (config: ConfigService<ConfigVariables>) => {
+        return {
+          host: config.get('REDIS_HOST')!,
+          port: parseInt(config.get('REDIS_PORT')!),
+          password: config.get('REDIS_PASSWORD')!,
+        };
+      },
+      inject: [ConfigService],
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
