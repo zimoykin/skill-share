@@ -15,6 +15,13 @@ const schema = {
   GITHUB_CALLBACK_URL: Joi.string().required(),
   FRONTEND_GITHUB_AUTH_PAGE: Joi.string().required(),
   LOG_LEVEL: Joi.string().valid('trace', 'debug', 'info', 'warn', 'error'),
+  GITHUB_PAT_TOKEN: Joi.string().required(),
+  GITHUB_REPO_OWNER: Joi.string().required(),
+  GITHUB_REPO_NAME: Joi.string().required(),
+  GITHUB_NAVIGATION: Joi.string().required(),
+  REDIS_HOST: Joi.string().required(),
+  REDIS_PORT: Joi.number().required(),
+  REDIS_PASSWORD: Joi.string().required(),
   MONGO_CONNECTION: Joi.string()
     .uri({ scheme: ['mongodb', 'mongodb+srv'] })
     .optional(),
