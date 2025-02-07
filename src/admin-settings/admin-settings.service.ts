@@ -15,6 +15,19 @@ export class AdminSettingsService {
     private readonly githubService: GithubService,
     @InjectCacheRedis() private readonly redisCacheService: RedisCacheService,
   ) {}
+  /**
+   * Retrieves the navigation links for a user and caches them if not already cached.
+   * If cached links are available, they are fetched from the cache. Otherwise,
+   * they are retrieved from the GitHub service and cached for future requests.
+   * The links are sorted and filtered based on the user's role, with certain links
+   * being disabled for non-admin users.
+   *
+   * @param userId - The ID of the user for whom to retrieve the navigation links.
+   * @returns A promise that resolves to an object containing the navigation links
+   *          with titles as keys and link details as values.
+   * @throws NotFoundException if the user is not found.
+   */
+
   async getNavbar(userId: string): Promise<NavLink> {
     const navCached = await this.redisCacheService.getValueByKey('nav-links');
     let navLins: INavLinkStaticData;
@@ -68,6 +81,18 @@ export class AdminSettingsService {
     return result;
   }
 
+  /**
+   * Retrieves the widgets for a user and caches them if not already cached.
+   * If cached links are available, they are fetched from the cache. Otherwise,
+   * they are retrieved from the GitHub service and cached for future requests.
+   * The widgets are sorted and filtered based on the user's role, with certain widgets
+   * being disabled for non-admin users.
+   *
+   * @param userId - The ID of the user for whom to retrieve the navigation links.
+   * @returns A promise that resolves to an object containing the widgets
+   *          with titles as keys and link details as values.
+   * @throws NotFoundException if the user is not found.
+   */
   async getWidgets(userId: string) {
     const user = await this.userService.findUserById(userId);
     const widgets: Widget = {};
